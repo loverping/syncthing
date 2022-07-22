@@ -8,12 +8,12 @@ package model
 
 import (
 	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/d4l3k/messagediff"
 
 	"github.com/syncthing/syncthing/lib/config"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 )
 
 type unifySubsCase struct {
@@ -96,7 +96,7 @@ func unifySubsCases() []unifySubsCase {
 		},
 	}
 
-	if runtime.GOOS == "windows" {
+	if runtimeos.IsWindows {
 		// Fixup path separators
 		for i := range cases {
 			for j, p := range cases[i].in {

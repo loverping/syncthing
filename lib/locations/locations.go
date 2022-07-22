@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/syncthing/syncthing/lib/fs"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 )
 
 type LocationEnum string
@@ -133,13 +134,13 @@ func expandLocations() error {
 // trying.
 func defaultConfigDir(userHome string) string {
 	switch runtime.GOOS {
-	case "windows":
+	case runtimeos.Windows:
 		if p := os.Getenv("LocalAppData"); p != "" {
 			return filepath.Join(p, "Syncthing")
 		}
 		return filepath.Join(os.Getenv("AppData"), "Syncthing")
 
-	case "darwin":
+	case runtimeos.Darwin:
 		return filepath.Join(userHome, "Library/Application Support/Syncthing")
 
 	default:
@@ -153,30 +154,28 @@ func defaultConfigDir(userHome string) string {
 // defaultDataDir returns the default data directory, which usually is the
 // config directory but might be something else.
 func defaultDataDir(userHome, config string) string {
-	switch runtime.GOOS {
-	case "windows", "darwin":
-		return config
-
-	default:
-		// If a database exists at the "normal" location, use that anyway.
-		if _, err := os.Lstat(filepath.Join(config, LevelDBDir)); err == nil {
-			return config
-		}
-		// Always use this env var, as it's explicitly set by the user
-		if xdgHome := os.Getenv("XDG_DATA_HOME"); xdgHome != "" {
-			return filepath.Join(xdgHome, "syncthing")
-		}
-		// Only use the XDG default, if a syncthing specific dir already
-		// exists. Existence of ~/.local/share is not deemed enough, as
-		// it may also exist erroneously on non-XDG systems.
-		xdgDefault := filepath.Join(userHome, ".local/share/syncthing")
-		if _, err := os.Lstat(xdgDefault); err == nil {
-			return xdgDefault
-		}
-		// FYI: XDG_DATA_DIRS is not relevant, as it is for system-wide
-		// data dirs, not user specific ones.
+	if runtimeos.IsWindows || runtimeos.IsDarwin {
 		return config
 	}
+
+	// If a database exists at the "normal" location, use that anyway.
+	if _, err := os.Lstat(filepath.Join(config, LevelDBDir)); err == nil {
+		return config
+	}
+	// Always use this env var, as it's explicitly set by the user
+	if xdgHome := os.Getenv("XDG_DATA_HOME"); xdgHome != "" {
+		return filepath.Join(xdgHome, "syncthing")
+	}
+	// Only use the XDG default, if a syncthing specific dir already
+	// exists. Existence of ~/.local/share is not deemed enough, as
+	// it may also exist erroneously on non-XDG systems.
+	xdgDefault := filepath.Join(userHome, ".local/share/syncthing")
+	if _, err := os.Lstat(xdgDefault); err == nil {
+		return xdgDefault
+	}
+	// FYI: XDG_DATA_DIRS is not relevant, as it is for system-wide
+	// data dirs, not user specific ones.
+	return config
 }
 
 // userHomeDir returns the user's home directory, or dies trying.

@@ -11,20 +11,18 @@ package main
 
 import (
 	"os/exec"
-	"runtime"
 	"syscall"
+
+	"github.com/syncthing/syncthing/lib/runtimeos"
 )
 
 func openURL(url string) error {
-	switch runtime.GOOS {
-	case "darwin":
+	if runtimeos.IsDarwin {
 		return exec.Command("open", url).Run()
-
-	default:
-		cmd := exec.Command("xdg-open", url)
-		cmd.SysProcAttr = &syscall.SysProcAttr{
-			Setpgid: true,
-		}
-		return cmd.Run()
 	}
+	cmd := exec.Command("xdg-open", url)
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+	}
+	return cmd.Run()
 }

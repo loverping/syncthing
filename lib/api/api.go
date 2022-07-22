@@ -51,6 +51,7 @@ import (
 	"github.com/syncthing/syncthing/lib/model"
 	"github.com/syncthing/syncthing/lib/protocol"
 	"github.com/syncthing/syncthing/lib/rand"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 	"github.com/syncthing/syncthing/lib/svcutil"
 	"github.com/syncthing/syncthing/lib/sync"
 	"github.com/syncthing/syncthing/lib/tlsutil"
@@ -1925,7 +1926,7 @@ func shouldRegenerateCertificate(cert tls.Certificate) error {
 	// On macOS, check for certificates issued on or after July 1st, 2019,
 	// with a longer validity time than 825 days.
 	cutoff := time.Date(2019, 7, 1, 0, 0, 0, 0, time.UTC)
-	if runtime.GOOS == "darwin" &&
+	if runtimeos.IsDarwin &&
 		leaf.NotBefore.After(cutoff) &&
 		leaf.NotAfter.Sub(leaf.NotBefore) > 825*24*time.Hour {
 		return errors.New("certificate incompatible with macOS 10.15 (Catalina)")

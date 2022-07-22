@@ -15,7 +15,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"runtime"
 	rdebug "runtime/debug"
 	"sort"
 	"sync"
@@ -26,6 +25,7 @@ import (
 	"github.com/syncthing/syncthing/lib/fs"
 	"github.com/syncthing/syncthing/lib/ignore"
 	"github.com/syncthing/syncthing/lib/protocol"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 	"github.com/syncthing/syncthing/lib/sha256"
 	"golang.org/x/text/unicode/norm"
 )
@@ -178,7 +178,7 @@ func TestVerify(t *testing.T) {
 }
 
 func TestNormalization(t *testing.T) {
-	if runtime.GOOS == "darwin" {
+	if runtimeos.IsDarwin {
 		t.Skip("Normalization test not possible on darwin")
 		return
 	}
@@ -197,7 +197,7 @@ func TestNormalization(t *testing.T) {
 	}
 	numInvalid := 2
 
-	if runtime.GOOS == "windows" {
+	if runtimeos.IsWindows {
 		// On Windows, in case 5 the character gets replaced with a
 		// replacement character \xEF\xBF\xBD at the point it's written to disk,
 		// which means it suddenly becomes valid (sort of).
@@ -257,7 +257,7 @@ func TestNormalization(t *testing.T) {
 func TestNormalizationDarwinCaseFS(t *testing.T) {
 	// This tests that normalization works on Darwin, through a CaseFS.
 
-	if runtime.GOOS != "darwin" {
+	if !runtimeos.IsDarwin {
 		t.Skip("Normalization test not possible on non-Darwin")
 		return
 	}
@@ -321,7 +321,7 @@ func TestIssue1507(t *testing.T) {
 }
 
 func TestWalkSymlinkUnix(t *testing.T) {
-	if runtime.GOOS == "windows" {
+	if runtimeos.IsWindows {
 		t.Skip("skipping unsupported symlink test")
 		return
 	}
@@ -351,7 +351,7 @@ func TestWalkSymlinkUnix(t *testing.T) {
 }
 
 func TestWalkSymlinkWindows(t *testing.T) {
-	if runtime.GOOS != "windows" {
+	if !runtimeos.IsWindows {
 		t.Skip("skipping unsupported symlink test")
 	}
 
@@ -386,7 +386,7 @@ func TestWalkRootSymlink(t *testing.T) {
 	dest, _ := filepath.Abs("testdata/dir1")
 	destFs := fs.NewFilesystem(testFsType, dest)
 	if err := fs.DebugSymlinkForTestsOnly(destFs, testFs, ".", "link"); err != nil {
-		if runtime.GOOS == "windows" {
+		if runtimeos.IsWindows {
 			// Probably we require permissions we don't have.
 			t.Skip("Need admin permissions or developer mode to run symlink test on Windows: " + err.Error())
 		} else {
@@ -406,7 +406,7 @@ func TestWalkRootSymlink(t *testing.T) {
 	files = walkDir(testFs, "link", nil, nil, 0)
 
 	// Verify that we got the one symlink, except on windows
-	if runtime.GOOS == "windows" {
+	if runtimeos.IsWindows {
 		if len(files) != 0 {
 			t.Errorf("expected no files, not %d", len(files))
 		}

@@ -11,7 +11,6 @@ import (
 	"errors"
 	"io"
 	"os"
-	"runtime"
 	"sync"
 	"testing"
 	"testing/quick"
@@ -19,6 +18,7 @@ import (
 
 	lz4 "github.com/pierrec/lz4/v4"
 	"github.com/syncthing/syncthing/lib/rand"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 	"github.com/syncthing/syncthing/lib/testutils"
 )
 
@@ -848,7 +848,7 @@ func TestIsEquivalent(t *testing.T) {
 		},
 	}
 
-	if runtime.GOOS == "windows" {
+	if runtimeos.IsWindows {
 		// On windows we only check the user writable bit of the permission
 		// set, so these are equivalent.
 		cases = append(cases, testCase{

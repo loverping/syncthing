@@ -14,7 +14,6 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"sync/atomic"
 	"syscall"
@@ -24,6 +23,7 @@ import (
 	"github.com/syncthing/syncthing/lib/events"
 	"github.com/syncthing/syncthing/lib/osutil"
 	"github.com/syncthing/syncthing/lib/relay/protocol"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 	"github.com/syncthing/syncthing/lib/tlsutil"
 	"golang.org/x/time/rate"
 
@@ -146,7 +146,7 @@ func main() {
 		log.Println("Connection limit", descriptorLimit)
 
 		go monitorLimits()
-	} else if err != nil && runtime.GOOS != "windows" {
+	} else if err != nil && !runtimeos.IsWindows {
 		log.Println("Assuming no connection limit, due to error retrieving rlimits:", err)
 	}
 

@@ -9,11 +9,11 @@ package osutil_test
 import (
 	"os"
 	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/syncthing/syncthing/lib/fs"
 	"github.com/syncthing/syncthing/lib/osutil"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 )
 
 func TestTraversesSymlink(t *testing.T) {
@@ -22,7 +22,7 @@ func TestTraversesSymlink(t *testing.T) {
 	testFs := fs.NewFilesystem(fs.FilesystemTypeBasic, tmpDir)
 	testFs.MkdirAll("a/b/c", 0755)
 	if err := fs.DebugSymlinkForTestsOnly(testFs, testFs, filepath.Join("a", "b"), filepath.Join("a", "l")); err != nil {
-		if runtime.GOOS == "windows" {
+		if runtimeos.IsWindows {
 			t.Skip("Symlinks aren't working")
 		}
 		t.Fatal(err)
@@ -71,7 +71,7 @@ func TestIssue4875(t *testing.T) {
 	testFs := fs.NewFilesystem(fs.FilesystemTypeBasic, tmpDir)
 	testFs.MkdirAll(filepath.Join("a", "b", "c"), 0755)
 	if err := fs.DebugSymlinkForTestsOnly(testFs, testFs, filepath.Join("a", "b"), filepath.Join("a", "l")); err != nil {
-		if runtime.GOOS == "windows" {
+		if runtimeos.IsWindows {
 			t.Skip("Symlinks aren't working")
 		}
 		t.Fatal(err)

@@ -11,7 +11,6 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -23,6 +22,7 @@ import (
 	"github.com/syncthing/syncthing/lib/ignore"
 	"github.com/syncthing/syncthing/lib/osutil"
 	"github.com/syncthing/syncthing/lib/protocol"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 	"golang.org/x/text/unicode/norm"
 )
 
@@ -451,7 +451,7 @@ func (w *walker) walkDir(ctx context.Context, relPath string, info fs.FileInfo, 
 func (w *walker) walkSymlink(ctx context.Context, relPath string, info fs.FileInfo, finishedChan chan<- ScanResult) error {
 	// Symlinks are not supported on Windows. We ignore instead of returning
 	// an error.
-	if runtime.GOOS == "windows" {
+	if runtimeos.IsWindows {
 		return nil
 	}
 
@@ -494,7 +494,7 @@ func (w *walker) walkSymlink(ctx context.Context, relPath string, info fs.FileIn
 // normalizePath returns the normalized relative path (possibly after fixing
 // it on disk), or skip is true.
 func (w *walker) normalizePath(path string, info fs.FileInfo) (normPath string, err error) {
-	if runtime.GOOS == "darwin" {
+	if runtimeos.IsDarwin {
 		// Mac OS X file names should always be NFD normalized.
 		normPath = norm.NFD.String(path)
 	} else {
@@ -552,7 +552,7 @@ func (w *walker) normalizePath(path string, info fs.FileInfo) (normPath string, 
 
 // updateFileInfo updates walker specific members of protocol.FileInfo that do not depend on type
 func (w *walker) updateFileInfo(file, curFile protocol.FileInfo) protocol.FileInfo {
-	if file.Type == protocol.FileInfoTypeFile && runtime.GOOS == "windows" {
+	if file.Type == protocol.FileInfoTypeFile && runtimeos.IsWindows {
 		// If we have an existing index entry, copy the executable bits
 		// from there.
 		file.Permissions |= (curFile.Permissions & 0111)

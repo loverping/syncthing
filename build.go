@@ -31,6 +31,8 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/syncthing/syncthing/lib/runtimeos"
 )
 
 var (
@@ -393,7 +395,7 @@ func test(tags []string, pkgs ...string) {
 
 	if runtime.GOARCH == "amd64" {
 		switch runtime.GOOS {
-		case "darwin", "linux", "freebsd": // , "windows": # See https://github.com/golang/go/issues/27089
+		case runtimeos.Darwin, runtimeos.Linux, runtimeos.FreeBSD: // , "windows": # See https://github.com/golang/go/issues/27089
 			args = append(args, "-race")
 		}
 	}

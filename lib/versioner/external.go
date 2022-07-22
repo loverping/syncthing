@@ -12,12 +12,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"runtime"
 	"strings"
 	"time"
 
 	"github.com/syncthing/syncthing/lib/config"
 	"github.com/syncthing/syncthing/lib/fs"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 
 	"github.com/kballard/go-shellquote"
 )
@@ -35,7 +35,7 @@ type external struct {
 func newExternal(cfg config.FolderConfiguration) Versioner {
 	command := cfg.Versioning.Params["command"]
 
-	if runtime.GOOS == "windows" {
+	if runtimeos.IsWindows {
 		command = strings.ReplaceAll(command, `\`, `\\`)
 	}
 

@@ -47,6 +47,7 @@ import (
 	"github.com/syncthing/syncthing/lib/logger"
 	"github.com/syncthing/syncthing/lib/osutil"
 	"github.com/syncthing/syncthing/lib/protocol"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 	"github.com/syncthing/syncthing/lib/svcutil"
 	"github.com/syncthing/syncthing/lib/syncthing"
 	"github.com/syncthing/syncthing/lib/upgrade"
@@ -199,7 +200,7 @@ func defaultVars() kong.Vars {
 	// Windows, the "default" options.logFile will later be replaced with the
 	// default path, unless the user has manually specified "-" or
 	// something else.
-	if runtime.GOOS == "windows" {
+	if runtimeos.IsWindows {
 		vars["logFile"] = "default"
 	} else {
 		vars["logFile"] = "-"

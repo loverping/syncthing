@@ -12,7 +12,6 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -24,6 +23,7 @@ import (
 	"github.com/syncthing/syncthing/lib/fs"
 	"github.com/syncthing/syncthing/lib/protocol"
 	"github.com/syncthing/syncthing/lib/rand"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 )
 
 func TestRequestSimple(t *testing.T) {
@@ -72,7 +72,7 @@ func TestRequestSimple(t *testing.T) {
 func TestSymlinkTraversalRead(t *testing.T) {
 	// Verify that a symlink can not be traversed for reading.
 
-	if runtime.GOOS == "windows" {
+	if runtimeos.IsWindows {
 		t.Skip("no symlink support on CI")
 		return
 	}
@@ -115,7 +115,7 @@ func TestSymlinkTraversalRead(t *testing.T) {
 func TestSymlinkTraversalWrite(t *testing.T) {
 	// Verify that a symlink can not be traversed for writing.
 
-	if runtime.GOOS == "windows" {
+	if runtimeos.IsWindows {
 		t.Skip("no symlink support on CI")
 		return
 	}
@@ -214,7 +214,7 @@ func TestRequestCreateTmpSymlink(t *testing.T) {
 }
 
 func TestRequestVersioningSymlinkAttack(t *testing.T) {
-	if runtime.GOOS == "windows" {
+	if runtimeos.IsWindows {
 		t.Skip("no symlink support on Windows")
 	}
 
@@ -613,7 +613,7 @@ func TestParentDeletion(t *testing.T) {
 // TestRequestSymlinkWindows checks that symlinks aren't marked as deleted on windows
 // Issue: https://github.com/syncthing/syncthing/issues/5125
 func TestRequestSymlinkWindows(t *testing.T) {
-	if runtime.GOOS != "windows" {
+	if !runtimeos.IsWindows {
 		t.Skip("windows specific test")
 	}
 

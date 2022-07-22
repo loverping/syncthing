@@ -10,7 +10,6 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"testing"
 	"time"
@@ -19,6 +18,7 @@ import (
 	"github.com/syncthing/syncthing/lib/events"
 	"github.com/syncthing/syncthing/lib/fs"
 	"github.com/syncthing/syncthing/lib/protocol"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 )
 
 func TestMain(m *testing.M) {
@@ -329,7 +329,7 @@ func testAggregatorOutput(t *testing.T, fsWatchChan <-chan []string, expectedBat
 			continue
 		}
 
-		if runtime.GOOS != "darwin" {
+		if !runtimeos.IsDarwin {
 			now := time.Since(startTime)
 			if innerIndex == 0 {
 				switch {

@@ -11,12 +11,12 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
 	"sort"
 	"strings"
 	"sync"
 
 	"github.com/syncthing/syncthing/lib/fs"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 	"github.com/syncthing/syncthing/lib/upgrade"
 	"github.com/syncthing/syncthing/lib/util"
 )
@@ -189,7 +189,7 @@ func migrateToConfigV24(cfg *Configuration) {
 
 func migrateToConfigV23(cfg *Configuration) {
 	permBits := fs.FileMode(0777)
-	if runtime.GOOS == "windows" {
+	if runtimeos.IsWindows {
 		// Windows has no umask so we must chose a safer set of bits to
 		// begin with.
 		permBits = 0700

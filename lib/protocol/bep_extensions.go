@@ -8,10 +8,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"runtime"
 	"time"
 
 	"github.com/syncthing/syncthing/lib/rand"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 	"github.com/syncthing/syncthing/lib/sha256"
 )
 
@@ -202,16 +202,19 @@ func (f FileInfo) IsEquivalentOptional(other FileInfo, modTimeWindow time.Durati
 // i.e. it does purposely not check only selected (see below) struct members.
 // Permissions (config) and blocks (scanning) can be excluded from the comparison.
 // Any file info is not "equivalent", if it has different
-//  - type
-//  - deleted flag
-//  - invalid flag
-//  - permissions, unless they are ignored
+//   - type
+//   - deleted flag
+//   - invalid flag
+//   - permissions, unless they are ignored
+//
 // A file is not "equivalent", if it has different
-//  - modification time (difference bigger than modTimeWindow)
-//  - size
-//  - blocks, unless there are no blocks to compare (scanning)
+//   - modification time (difference bigger than modTimeWindow)
+//   - size
+//   - blocks, unless there are no blocks to compare (scanning)
+//
 // A symlink is not "equivalent", if it has different
-//  - target
+//   - target
+//
 // A directory does not have anything specific to check.
 func (f FileInfo) isEquivalent(other FileInfo, modTimeWindow time.Duration, ignorePerms bool, ignoreBlocks bool, ignoreFlags uint32) bool {
 	if f.MustRescan() || other.MustRescan() {
@@ -257,15 +260,13 @@ func ModTimeEqual(a, b time.Time, modTimeWindow time.Duration) bool {
 }
 
 func PermsEqual(a, b uint32) bool {
-	switch runtime.GOOS {
-	case "windows":
+	if runtimeos.IsWindows {
 		// There is only writeable and read only, represented for user, group
 		// and other equally. We only compare against user.
 		return a&0600 == b&0600
-	default:
-		// All bits count
-		return a&0777 == b&0777
 	}
+	// All bits count
+	return a&0777 == b&0777
 }
 
 // BlocksEqual returns true when the two files have identical block lists.

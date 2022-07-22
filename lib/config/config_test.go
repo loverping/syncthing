@@ -26,6 +26,7 @@ import (
 	"github.com/syncthing/syncthing/lib/events"
 	"github.com/syncthing/syncthing/lib/fs"
 	"github.com/syncthing/syncthing/lib/protocol"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 )
 
 var device1, device2, device3, device4 protocol.DeviceID
@@ -447,7 +448,7 @@ func TestVersioningConfig(t *testing.T) {
 }
 
 func TestIssue1262(t *testing.T) {
-	if runtime.GOOS != "windows" {
+	if !runtimeos.IsWindows {
 		t.Skipf("path gets converted to absolute as part of the filesystem initialization on linux")
 	}
 
@@ -540,7 +541,7 @@ func TestFolderCheckPath(t *testing.T) {
 			path: "link",
 			err:  nil,
 		})
-	} else if runtime.GOOS != "windows" {
+	} else if !runtimeos.IsWindows {
 		t.Log("running without symlink check")
 		t.Fatal(err)
 	}
@@ -595,7 +596,7 @@ func TestNewSaveLoad(t *testing.T) {
 }
 
 func TestWindowsLineEndings(t *testing.T) {
-	if runtime.GOOS != "windows" {
+	if !runtimeos.IsWindows {
 		t.Skip("Windows specific")
 	}
 

@@ -19,7 +19,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -39,6 +38,7 @@ import (
 	"github.com/syncthing/syncthing/lib/model"
 	modelmocks "github.com/syncthing/syncthing/lib/model/mocks"
 	"github.com/syncthing/syncthing/lib/protocol"
+	"github.com/syncthing/syncthing/lib/runtimeos"
 	"github.com/syncthing/syncthing/lib/svcutil"
 	"github.com/syncthing/syncthing/lib/sync"
 	"github.com/syncthing/syncthing/lib/tlsutil"
@@ -1255,7 +1255,7 @@ func TestShouldRegenerateCertificate(t *testing.T) {
 		t.Error("expected no error:", err)
 	}
 
-	if runtime.GOOS == "darwin" {
+	if runtimeos.IsDarwin {
 		// Certificates with too long an expiry time are not allowed on macOS
 		crt, err = tlsutil.NewCertificateInMemory("foo.example.com", 1000)
 		if err != nil {
@@ -1416,7 +1416,7 @@ func TestSanitizedHostname(t *testing.T) {
 // be prone to false negatives if things change in the future, but likely
 // not false positives.
 func runningInContainer() bool {
-	if runtime.GOOS != "linux" {
+	if !runtimeos.IsLinux {
 		return false
 	}
 
