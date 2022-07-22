@@ -6,4 +6,4 @@
 
 package runtimeos
 
-//go:generate ./runtimeos.sh
+//go:generate /bin/sh runtimeos.sh
